@@ -16,6 +16,82 @@ import base64
 from io import BytesIO
 from rasterio.mask import mask
 
+st.set_page_config(layout="wide")
+st.title("📊📍 Viewer Data Geospasial")
+
+DATA_DIR = "data"
+
+# ====================
+# Fungsi: Menampilkan CSV
+# ====================
+def show_csv():
+    st.subheader("📄 Data CSV")
+    csv_files = [f for f in os.listdir(DATA_DIR) if f.endswith(".csv")]
+
+    if not csv_files:
+        st.warning("Tidak ada file CSV di folder /data")
+        return
+
+    selected = st.selectbox("Pilih file CSV", csv_files)
+    df = pd.read_csv(os.path.join(DATA_DIR, selected))
+    st.success(f"Menampilkan: {selected}")
+    st.dataframe(df)
+
+# ====================
+# Fungsi: Menampilkan SHP
+# ====================
+def show_shp():
+    st.subheader("🗺️ Data Shapefile (SHP)")
+    shp_files = [f for f in os.listdir(DATA_DIR) if f.endswith(".shp")]
+
+    if not shp_files:
+        st.warning("Tidak ada file SHP di folder /data")
+        return
+
+    selected = st.selectbox("Pilih file SHP", shp_files)
+    try:
+        gdf = gpd.read_file(os.path.join(DATA_DIR, selected))
+        st.success(f"Menampilkan: {selected}")
+        st.map(gdf)
+    except Exception as e:
+        st.error(f"Gagal membaca file SHP: {e}")
+
+# ====================
+# Fungsi: Menampilkan TIFF
+# ====================
+def show_tif():
+    st.subheader("🌄 Data Raster (GeoTIFF)")
+    tif_files = [f for f in os.listdir(DATA_DIR) if f.endswith(".tif")]
+
+    if not tif_files:
+        st.warning("Tidak ada file TIFF di folder /data")
+        return
+
+    selected = st.selectbox("Pilih file GeoTIFF", tif_files)
+    try:
+        with rasterio.open(os.path.join(DATA_DIR, selected)) as src:
+            band = src.read(1)
+            st.success(f"Ukuran Raster: {band.shape}")
+            fig, ax = plt.subplots()
+            ax.imshow(band, cmap="YlGn", interpolation='none')
+            ax.set_title(selected)
+            ax.axis("off")
+            st.pyplot(fig)
+    except Exception as e:
+        st.error(f"Gagal membaca file TIFF: {e}")
+
+# ====================
+# Pilihan Menu Utama
+# ====================
+menu = st.sidebar.radio("🔍 Pilih Jenis Data", ["CSV", "Shapefile", "GeoTIFF"])
+
+if menu == "CSV":
+    show_csv()
+elif menu == "Shapefile":
+    show_shp()
+elif menu == "GeoTIFF":
+    show_tif()
+
 # === Konfigurasi halaman ===
 st.set_page_config(
     page_title="Analisis Kesesuaian Lahan Kentang - Kecamatan Kertasari",
