@@ -2,7 +2,6 @@ import streamlit as st
 import geopandas as gpd
 import rasterio
 import numpy as np
-import os
 import folium
 from streamlit_folium import st_folium
 from folium.plugins import Fullscreen
@@ -93,14 +92,14 @@ st.markdown("""
 
 # === Definisi Layer dan Colormap ===
 layer_options = {
-    "Kesesuaian Lahan Akhir": "potato_suitability_class.tif",
-    "Suhu": "temperature_suitability_score.tif",
-    "Ketinggian": "elevation_suitability_score.tif",
-    "Kemiringan": "slope_suitability_score.tif",
-    "pH Tanah": "pH_suitability_score.tif",
-    "Curah Hujan": "rainfall_suitability_score.tif",
-    "Tekstur Tanah": "soil_texture_suitability_score.tif",
-    "Tutupan Lahan": "landcover_suitability_score.tif"
+    "Kesesuaian Lahan Akhir": "data/potato_suitability_class.tif",
+    "Suhu": "data/temperature_suitability_score.tif",
+    "Ketinggian": "data/elevation_suitability_score.tif",
+    "Kemiringan": "data/slope_suitability_score.tif",
+    "pH Tanah": "data/pH_suitability_score.tif",
+    "Curah Hujan": "data/rainfall_suitability_score.tif",
+    "Tekstur Tanah": "data/soil_texture_suitability_score.tif",
+    "Tutupan Lahan": "data/landcover_suitability_score.tif"
 }
 
 # === Navigation ===
@@ -199,11 +198,11 @@ def homepage():
     
     # Distribusi Kelas Kesesuaian Akhir
     try:
-        df_distribution = pd.read_csv("potato_suitability_stats.csv")
+        df_distribution = pd.read_csv("data/potato_suitability_stats.csv")
         
-        required_columns = ['Kelas', 'Persentase', 'Piksel', 'Area_km2']
+        required_columns = ['Kelas', 'PersSemi Urbanentase', 'Piksel', 'Area_km2']
         if not all(col in df_distribution.columns for col in required_columns):
-            st.error("File CSV 'potato_suitability_stats.csv' tidak memiliki kolom yang diperlukan: Kelas, Persentase, Piksel, Area_km2")
+            st.error("File CSV 'data/potato_suitability_stats.csv' tidak memiliki kolom yang diperlukan: Kelas, Persentase, Piksel, Area_km2")
             return
         
         if df_distribution[['Kelas', 'Persentase']].isna().any().any():
@@ -231,7 +230,7 @@ def homepage():
         st.dataframe(df_distribution[['Kelas', 'Piksel', 'Persentase', 'Luas (Ha)']], use_container_width=True, hide_index=True)
         
     except FileNotFoundError:
-        st.error("File 'potato_suitability_stats.csv' tidak ditemukan. Pastikan file berada di direktori yang benar.")
+        st.error("File 'data/potato_suitability_stats.csv' tidak ditemukan. Pastikan file berada di direktori yang benar.")
     except Exception as e:
         st.error(f"Error loading data: {str(e)}")
 
@@ -291,11 +290,11 @@ def data_analysis():
     st.markdown("### 📈 Distribusi Kelas Kesesuaian Lahan")
     
     try:
-        df_distribution = pd.read_csv("potato_suitability_stats.csv")
+        df_distribution = pd.read_csv("data/potato_suitability_stats.csv")
         
         required_columns = ['Kelas', 'Piksel', 'Persentase', 'Area_km2']
         if not all(col in df_distribution.columns for col in required_columns):
-            st.error("File CSV 'potato_suitability_stats.csv' tidak memiliki kolom yang diperlukan: Kelas, Piksel, Persentase, Area_km2")
+            st.error("File CSV 'data/potato_suitability_stats.csv' tidak memiliki kolom yang diperlukan: Kelas, Piksel, Persentase, Area_km2")
             return
         
         df_distribution['Luas (Ha)'] = df_distribution['Area_km2'] * 100
@@ -338,20 +337,20 @@ def data_analysis():
         st.dataframe(df_distribution[['Kelas', 'Piksel', 'Persentase', 'Luas (Ha)']], use_container_width=True, hide_index=True)
         
     except FileNotFoundError:
-        st.error("File 'potato_suitability_stats.csv' tidak ditemukan. Pastikan file berada di direktori yang benar.")
+        st.error("File 'data/potato_suitability_stats.csv' tidak ditemukan. Pastikan file berada di direktori yang benar.")
     except Exception as e:
         st.error(f"Error loading data: {str(e)}")
     
     st.markdown("### 🔍 Analisis Parameter Individual")
     
     param_options = {
-        "Suhu": "temperature_suitability_stats.csv",
-        "Ketinggian": "elevation_statistics.csv",
-        "Kemiringan": "slope_statistics.csv",
-        "pH Tanah": "pH_suitability_stats.csv",
-        "Curah Hujan": "rainfall_suitability_stats.csv",
-        "Tekstur Tanah": "soil_texture_suitability_stats.csv",
-        "Tutupan Lahan": "landcover_statistics.csv"
+        "Suhu": "data/temperature_suitability_stats.csv",
+        "Ketinggian": "data/elevation_statistics.csv",
+        "Kemiringan": "data/slope_statistics.csv",
+        "pH Tanah": "data/pH_suitability_stats.csv",
+        "Curah Hujan": "data/rainfall_suitability_stats.csv",
+        "Tekstur Tanah": "data/soil_texture_suitability_stats.csv",
+        "Tutupan Lahan": "data/landcover_statistics.csv"
     }
     
     selected_param = st.selectbox("Pilih Parameter untuk Analisis:", list(param_options.keys()))
@@ -586,7 +585,7 @@ def create_interactive_map(raster_path, layer_name, opacity):
     )
     
     # Load shapefile for clipping and zooming
-    shp_path = "Kec_Kertasari.shp"
+    shp_path = "data/Kec_Kertasari.shp"
     try:
         gdf = gpd.read_file(shp_path)
         if gdf.crs != "EPSG:4326":
@@ -623,7 +622,7 @@ def create_interactive_map(raster_path, layer_name, opacity):
                 ).add_to(m)
                 
     except FileNotFoundError:
-        st.error(f"File SHP '{shp_path}' tidak ditemukan.")
+        st.error(f"File SHP 'data/Kec_Kertasari.shp' tidak ditemukan.")
         return m
     except Exception as e:
         st.error(f"Error loading SHP: {str(e)}")
@@ -718,81 +717,6 @@ def create_interactive_map(raster_path, layer_name, opacity):
         st.error(f"Error loading raster: {str(e)}")
         import traceback
         st.error(f"Traceback: {traceback.format_exc()}")
-    
-    folium.LayerControl().add_to(m)
-    Fullscreen().add_to(m)
-    
-    return m
-    
-    # Process raster with clipping
-    try:
-        with rasterio.open(raster_path) as src:
-            # Clip raster to shapefile
-            gdf_utm = gdf.to_crs(src.crs)  # Reproject shapefile to raster CRS
-            shapes = [geom for geom in gdf_utm.geometry]
-            out_image, out_transform = mask(src, shapes, crop=True, nodata=np.nan)
-            data = out_image[0]  # First band
-            
-            # Ensure nodata values are handled correctly
-            data = np.where(np.isnan(data), np.nan, data)
-            
-            # Calculate bounds for the clipped raster
-            rows, cols = np.where(~np.isnan(data))  # Get indices of valid data
-            if len(rows) == 0 or len(cols) == 0:
-                st.error("Raster tidak memiliki data valid setelah clipping.")
-                return m
-            
-            min_row, max_row = rows.min(), rows.max()
-            min_col, max_col = cols.min(), cols.max()
-            
-            # Transform bounds to lat/lon
-            top_left = rasterio.transform.xy(out_transform, min_row, min_col)
-            bottom_right = rasterio.transform.xy(out_transform, max_row, max_col)
-            raster_bounds = [[bottom_right[1], top_left[0]], [top_left[1], bottom_right[0]]]  # [[min_lat, min_lon], [max_lat, max_lon]]
-            
-            # Clip data to valid bounds
-            data = data[min_row:max_row+1, min_col:max_col+1]
-            
-            # Prepare colormap and normalize data
-            if layer_name == "Kesesuaian Lahan Akhir":
-                colors = ['#d7191c', '#fdae61', '#a6d96a', '#1a9641']
-                vmin, vmax = 1, 4
-                data = np.clip(data, 1, 4)
-            else:
-                colors = ['#d7191c', '#fdae61', '#a6d96a', '#1a9641']
-                vmin, vmax = 1, 4
-                data = np.clip(data, 1, 4)
-            
-            cmap = ListedColormap(colors)
-            norm = BoundaryNorm([0.5, 1.5, 2.5, 3.5, 4.5], cmap.N)
-            colored_data = plt.cm.ScalarMappable(norm=norm, cmap=cmap).to_rgba(data, bytes=True)
-            
-            # Set alpha channel to 0 for NaN values to ensure transparency
-            alpha_channel = np.where(np.isnan(data), 0, 255).astype(np.uint8)
-            colored_data[:, :, 3] = alpha_channel
-            
-            # Create image
-            img = Image.fromarray(colored_data, mode='RGBA')
-            
-            # Save image to base64
-            buffered = BytesIO()
-            img.save(buffered, format="PNG")
-            img_str = base64.b64encode(buffered.getvalue()).decode()
-            img_uri = f"data:image/png;base64,{img_str}"
-            
-            # Add raster overlay
-            overlay = folium.raster_layers.ImageOverlay(
-                image=img_uri,
-                bounds=raster_bounds,
-                opacity=opacity,
-                name=layer_name,
-                interactive=True,
-                zindex=1
-            )
-            overlay.add_to(m)
-            
-    except Exception as e:
-        st.error(f"Error loading raster: {str(e)}")
     
     folium.LayerControl().add_to(m)
     Fullscreen().add_to(m)
@@ -945,23 +869,23 @@ def analyze_parameter(csv_path, param_name):
 
 def validate_data_files():
     required_files = [
-        "potato_suitability_class.tif",
-        "temperature_suitability_score.tif",
-        "elevation_suitability_score.tif",
-        "slope_suitability_score.tif",
-        "pH_suitability_score.tif",
-        "rainfall_suitability_score.tif",
-        "soil_texture_suitability_score.tif",
-        "landcover_suitability_score.tif",
-        "Kec_Kertasari.shp",
-        "potato_suitability_stats.csv",
-        "temperature_suitability_stats.csv",
-        "elevation_statistics.csv",
-        "slope_statistics.csv",
-        "pH_suitability_stats.csv",
-        "rainfall_suitability_stats.csv",
-        "soil_texture_suitability_stats.csv",
-        "landcover_statistics.csv"
+        "data/potato_suitability_class.tif",
+        "data/temperature_suitability_score.tif",
+        "data/elevation_suitability_score.tif",
+        "data/slope_suitability_score.tif",
+        "data/pH_suitability_score.tif",
+        "data/rainfall_suitability_score.tif",
+        "data/soil_texture_suitability_score.tif",
+        "data/landcover_suitability_score.tif",
+        "data/Kec_Kertasari.shp",
+        "data/potato_suitability_stats.csv",
+        "data/temperature_suitability_stats.csv",
+        "data/elevation_statistics.csv",
+        "data/slope_statistics.csv",
+        "data/pH_suitability_stats.csv",
+        "data/rainfall_suitability_stats.csv",
+        "data/soil_texture_suitability_stats.csv",
+        "data/landcover_statistics.csv"
     ]
     
     missing_files = []
@@ -995,7 +919,7 @@ if __name__ == "__main__":
         st.error("❌ Tidak dapat menjalankan aplikasi karena file data tidak lengkap.")
         st.info("""
         **Solusi:**
-        1. Pastikan semua file raster (.tif), SHP (.shp), dan CSV (.csv) berada dalam folder yang sesuai
+        1. Pastikan semua file data raster (.tif), SHP (.shp), dan CSV (.csv) berada dalam folder 'data/'
         2. Periksa nama file sesuai dengan yang dibutuhkan
         3. Pastikan file tidak rusak dan dapat dibaca
         """)
