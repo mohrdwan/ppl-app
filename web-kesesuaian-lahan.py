@@ -92,14 +92,14 @@ st.markdown("""
 
 # === Definisi Layer dan Colormap ===
 layer_options = {
-    "Kesesuaian Lahan Akhir": "data/potato_suitability_class.tif",
-    "Suhu": "data/temperature_suitability_score.tif",
-    "Ketinggian": "data/elevation_suitability_score.tif",
-    "Kemiringan": "data/slope_suitability_score.tif",
-    "pH Tanah": "data/pH_suitability_score.tif",
-    "Curah Hujan": "data/rainfall_suitability_score.tif",
-    "Tekstur Tanah": "data/soil_texture_suitability_score.tif",
-    "Tutupan Lahan": "data/landcover_suitability_score.tif"
+    "Kesesuaian Lahan Akhir": "potato_suitability_class.tif",
+    "Suhu": "temperature_suitability_score.tif",
+    "Ketinggian": "elevation_suitability_score.tif",
+    "Kemiringan": "slope_suitability_score.tif",
+    "pH Tanah": "pH_suitability_score.tif",
+    "Curah Hujan": "rainfall_suitability_score.tif",
+    "Tekstur Tanah": "soil_texture_suitability_score.tif",
+    "Tutupan Lahan": "landcover_suitability_score.tif"
 }
 
 # === Navigation ===
@@ -198,11 +198,11 @@ def homepage():
     
     # Distribusi Kelas Kesesuaian Akhir
     try:
-        df_distribution = pd.read_csv("data/potato_suitability_stats.csv")
+        df_distribution = pd.read_csv("potato_suitability_stats.csv")
         
         required_columns = ['Kelas', 'Persentase', 'Piksel', 'Area_km2']
         if not all(col in df_distribution.columns for col in required_columns):
-            st.error("File CSV 'data/potato_suitability_stats.csv' tidak memiliki kolom yang diperlukan: Kelas, Persentase, Piksel, Area_km2")
+            st.error("File CSV 'potato_suitability_stats.csv' tidak memiliki kolom yang diperlukan: Kelas, Persentase, Piksel, Area_km2")
             return
         
         if df_distribution[['Kelas', 'Persentase']].isna().any().any():
@@ -290,11 +290,11 @@ def data_analysis():
     st.markdown("### 📈 Distribusi Kelas Kesesuaian Lahan")
     
     try:
-        df_distribution = pd.read_csv("data/potato_suitability_stats.csv")
+        df_distribution = pd.read_csv("potato_suitability_stats.csv")
         
         required_columns = ['Kelas', 'Piksel', 'Persentase', 'Area_km2']
         if not all(col in df_distribution.columns for col in required_columns):
-            st.error("File CSV 'data/potato_suitability_stats.csv' tidak memiliki kolom yang diperlukan: Kelas, Piksel, Persentase, Area_km2")
+            st.error("File CSV 'potato_suitability_stats.csv' tidak memiliki kolom yang diperlukan: Kelas, Piksel, Persentase, Area_km2")
             return
         
         df_distribution['Luas (Ha)'] = df_distribution['Area_km2'] * 100
@@ -337,20 +337,20 @@ def data_analysis():
         st.dataframe(df_distribution[['Kelas', 'Piksel', 'Persentase', 'Luas (Ha)']], use_container_width=True, hide_index=True)
         
     except FileNotFoundError:
-        st.error("File 'data/potato_suitability_stats.csv' tidak ditemukan. Pastikan file berada di direktori yang benar.")
+        st.error("File 'potato_suitability_stats.csv' tidak ditemukan. Pastikan file berada di direktori yang benar.")
     except Exception as e:
         st.error(f"Error loading data: {str(e)}")
     
     st.markdown("### 🔍 Analisis Parameter Individual")
     
     param_options = {
-        "Suhu": "data/temperature_suitability_stats.csv",
-        "Ketinggian": "data/elevation_statistics.csv",
-        "Kemiringan": "data/slope_statistics.csv",
-        "pH Tanah": "data/pH_suitability_stats.csv",
-        "Curah Hujan": "data/rainfall_suitability_stats.csv",
-        "Tekstur Tanah": "data/soil_texture_suitability_stats.csv",
-        "Tutupan Lahan": "data/landcover_statistics.csv"
+        "Suhu": "temperature_suitability_stats.csv",
+        "Ketinggian": "elevation_statistics.csv",
+        "Kemiringan": "slope_statistics.csv",
+        "pH Tanah": "pH_suitability_stats.csv",
+        "Curah Hujan": "rainfall_suitability_stats.csv",
+        "Tekstur Tanah": "soil_texture_suitability_stats.csv",
+        "Tutupan Lahan": "landcover_statistics.csv"
     }
     
     selected_param = st.selectbox("Pilih Parameter untuk Analisis:", list(param_options.keys()))
@@ -585,7 +585,7 @@ def create_interactive_map(raster_path, layer_name, opacity):
     )
     
     # Load shapefile for clipping and zooming
-    shp_path = "data/Kec_Kertasari.shp"
+    shp_path = "Kec_Kertasari.shp"
     try:
         gdf = gpd.read_file(shp_path)
         if gdf.crs != "EPSG:4326":
@@ -944,23 +944,23 @@ def analyze_parameter(csv_path, param_name):
 
 def validate_data_files():
     required_files = [
-        "data/potato_suitability_class.tif",
-        "data/temperature_suitability_score.tif",
-        "data/elevation_suitability_score.tif",
-        "data/slope_suitability_score.tif",
-        "data/pH_suitability_score.tif",
-        "data/rainfall_suitability_score.tif",
-        "data/soil_texture_suitability_score.tif",
-        "data/landcover_suitability_score.tif",
-        "data/Kec_Kertasari.shp",
-        "data/potato_suitability_stats.csv",
-        "data/temperature_suitability_stats.csv",
-        "data/elevation_statistics.csv",
-        "data/slope_statistics.csv",
-        "data/pH_suitability_stats.csv",
-        "data/rainfall_suitability_stats.csv",
-        "data/soil_texture_suitability_stats.csv",
-        "data/landcover_statistics.csv"
+        "potato_suitability_class.tif",
+        "temperature_suitability_score.tif",
+        "elevation_suitability_score.tif",
+        "slope_suitability_score.tif",
+        "pH_suitability_score.tif",
+        "rainfall_suitability_score.tif",
+        "soil_texture_suitability_score.tif",
+        "landcover_suitability_score.tif",
+        "Kec_Kertasari.shp",
+        "potato_suitability_stats.csv",
+        "temperature_suitability_stats.csv",
+        "elevation_statistics.csv",
+        "slope_statistics.csv",
+        "pH_suitability_stats.csv",
+        "rainfall_suitability_stats.csv",
+        "soil_texture_suitability_stats.csv",
+        "landcover_statistics.csv"
     ]
     
     missing_files = []
